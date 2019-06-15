@@ -42,6 +42,14 @@ workspaces.
 
     perl world-cup-slack.pl --slack=... --dbjson=/some/file.json
 
+Testing by posting to Slack is also possible. Use following instructions.
+
+- Remove your db.json file.
+- Run script once with --slack argument provided.
+- Go into db.json and manually update one of the "status:0" games to "status:3"
+- Run script second time, it will collect events and keep them with "posted:0"
+- Run script for third time. It will post all events at once.
+
 # LICENSE
 
 MIT.
