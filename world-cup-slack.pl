@@ -3,12 +3,12 @@ use strict;
 
 =head1 NAME
 
-world-cup-slack 0.01
+world-cup-slack 0.02
 
 =cut
 
 package WorldCupSlack;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use File::Slurper qw/read_text write_text/;
 use Furl;
