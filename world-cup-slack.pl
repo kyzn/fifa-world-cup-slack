@@ -132,7 +132,7 @@ my $event_prefix = {
 my $teams   = {}; # $id => $name
 my $matches = {}; # $id => { home => $team_id, away => $team_id, stage => $stage_id, status => $status }
                   # Status: 0 Finished, 1 Not started, 3 Live
-my $events  = {}; # $id => { match => $match_id, posted => 0/1, desc => "...", score => "..." }
+my $events  = {}; # $id => { posted => 0/1 }
                   # In slack mode, an event is added to db.json with posted 0 first time it's seen
                   # On the next run, 0s become 1 and we do post it to slack
                   # In debug mode, events are posted (to screen) right away and not added to db.json
@@ -192,7 +192,7 @@ foreach my $match_id (@live_matches){
           $events->{$eid}{posted} = 1;
         }
       } else { # first time seeing this event
-        $events->{$eid} = { score => $score, desc => $desc, posted => 0 };
+        $events->{$eid} = { posted => 0 };
       }
     } else { # debug mode
       post($score,$desc);
