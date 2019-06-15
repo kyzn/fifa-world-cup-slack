@@ -190,12 +190,15 @@ foreach my $match_id (@live_matches){
         } else { # not posted yet, post it now.
           post($score,$desc);
           $events->{$eid}{posted} = 1;
+          # Mark game is done if we are posting end of game.
+          $matches->{$match_id}{status} = 0 if $e->{Type} == 26;
         }
       } else { # first time seeing this event
         $events->{$eid} = { posted => 0 };
       }
     } else { # debug mode
       post($score,$desc);
+      $matches->{$match_id}{status} = 0 if $e->{Type} == 26;
     }
   }
 }
@@ -236,13 +239,17 @@ sub download_calendar {
   die 'No results found in calendar' unless scalar @games;
 
   foreach my $game (@games){
+    my $match_id = $game->{IdMatch};
+    my $known_live = $matches->{$match_id} && ($matches->{$match_id}{status} == 3);
     $teams->{$game->{Home}{IdTeam}} = $game->{Home}{TeamName}[0]{Description};
     $teams->{$game->{Away}{IdTeam}} = $game->{Away}{TeamName}[0]{Description};
-    $matches->{$game->{IdMatch}} = {
+    $matches->{$match_id} = {
       home   => $game->{Home}{IdTeam},
       away   => $game->{Away}{IdTeam},
       stage  => $game->{IdStage},
-      status => $game->{MatchStatus},
+      # Don't update running games as "done" here.
+      # That will prevent from sending the last message.
+      $known_live ? ( status => 3 ) : (status => $game->{MatchStatus}),
     }
   }
 }
