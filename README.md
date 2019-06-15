@@ -1,3 +1,5 @@
+![A sample run](sample.png)
+
 # NAME
 
 world-cup-slack 0.01
