@@ -108,8 +108,25 @@ my $competition_id = 103;
 my $season_id      = 278513;
 
 my $furl = Furl->new;
-my @event_types = qw( 0 2 3 4 5 7 8 26 34 39 41 46 60 65 71 72 ); # to be posted
-my %event_types = map { $_ => 1 } @event_types;
+my $event_prefix = {
+  0  => ':soccer: Goooooalll!',
+  2  => ':collision: Yellow card!',
+  3  => ':collision::collision: Red card!',
+  4  => ':collision::collision: Red card!',
+  5  => ':arrows_counterclockwise:',
+  7  => ':zap:',
+  8  => ':stopwatch:',
+  26 => ':clap:',
+  34 => ':face_palm: Own goal!',
+  39 => ':soccer: Goooooalll!',
+  41 => ':soccer: Goooooalll!',
+  46 => ':no_good: Hit the bar!',
+  60 => ':no_good: Saved!',
+  65 => ':no_good: Missed!',
+  71 => ':tv:',
+  72 => ':exclamation: Penalty!!',
+};
+
 
 # To be read from db.json
 my $teams   = {}; # $id => $name
@@ -159,7 +176,7 @@ foreach my $match_id (@live_matches){
     # Skip if we don't have a description
     next unless defined $e->{EventDescription}[0];
     # Skip if it's not one of events that we want to post
-    next unless $event_types{$e->{Type}};
+    next unless $event_prefix->{$e->{Type}};
     # Skip if it's already posted (in slack mode)
     next if $slack && $events->{$eid} && ($events->{$eid}{posted} == 1);
 
@@ -191,7 +208,8 @@ write_text($dbjson_filename,encode_json({teams=>$teams,matches=>$matches,events=
 sub get_score {
   my ($event,$home,$away) = @_;
   my $is_penalties = ($event->{Period} == 11) ? 1 : 0;
-  my $score = $home . ' ' . $event->{HomeGoals} . ' '
+  my $score = $event_prefix->{$event->{Type}} . ' '
+            . $home . ' ' . $event->{HomeGoals} . ' '
             . ($is_penalties ? '(' . $event->{HomePenaltyGoals} . ') ' : '')
             . '- '
             . ($is_penalties ? '(' . $event->{AwayPenaltyGoals} . ') ' : '')
