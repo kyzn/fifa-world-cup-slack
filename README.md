@@ -2,7 +2,7 @@
 
 # NAME
 
-world-cup-slack 0.02
+world-cup-slack 0.03
 
 # DESCRIPTION
 
@@ -38,9 +38,12 @@ Increase politeness sleep (defaults to 2 seconds)
 
     perl world-cup-slack.pl --slack=... --sleep=10
 
-You can manually specify location of db.json file.
-This may be helpful if you are posting to multiple
-workspaces.
+Specify multiple Slack URLs to post to multiple workspaces
+
+    perl world-cup-slack.pl --slack=... --slack=...
+
+Specify name and location of db.json file. This may be
+helpful if you are running multiple instances of script.
 
     perl world-cup-slack.pl --slack=... --dbjson=/some/file.json
 

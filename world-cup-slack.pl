@@ -3,12 +3,12 @@ use strict;
 
 =head1 NAME
 
-world-cup-slack 0.02
+world-cup-slack 0.03
 
 =cut
 
 package WorldCupSlack;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use File::Slurper qw/read_text write_text/;
 use Furl;
@@ -56,9 +56,12 @@ Increase politeness sleep (defaults to 2 seconds)
 
   perl world-cup-slack.pl --slack=... --sleep=10
 
-You can manually specify location of db.json file.
-This may be helpful if you are posting to multiple
-workspaces.
+Specify multiple Slack URLs to post to multiple workspaces
+
+  perl world-cup-slack.pl --slack=... --slack=...
+
+Specify name and location of db.json file. This may be
+helpful if you are running multiple instances of script.
 
   perl world-cup-slack.pl --slack=... --dbjson=/some/file.json
 
@@ -90,18 +93,18 @@ which was written in PHP.
 
 =cut
 
-my $slack = '';
+my @slack = ();
 my $debug = '';
 my $sleep = 2;
 my $dbjson_filename = './db.json';
 
 GetOptions(
-  'slack=s' => \$slack,
+  'slack=s' => \@slack,
   'debug=s' => \$debug,
   'sleep=i' => \$sleep,
   'dbjson=s' => \$dbjson_filename,
 ) or die 'Encountered an error when parsing arguments';
-die 'You have to specify one of --slack OR --debug' unless $slack xor $debug;
+die 'You have to specify one of --slack OR --debug' unless @slack xor $debug;
 
 # Women's World Cup 2019 in France
 my $competition_id = 103;
@@ -178,12 +181,12 @@ foreach my $match_id (@live_matches){
     # Skip if it's not one of events that we want to post
     next unless $event_prefix->{$e->{Type}};
     # Skip if it's already posted (in slack mode)
-    next if $slack && $events->{$eid} && ($events->{$eid}{posted} == 1);
+    next if @slack && $events->{$eid} && ($events->{$eid}{posted} == 1);
 
     my $score = get_score($e, $home, $away);
     my $desc  = $e->{EventDescription}[0]{Description};
 
-    if ($slack){ # slack mode
+    if (@slack){ # slack mode
       if ($events->{$eid}){ # event already seen..
         if ($events->{$eid}{posted} == 1){ # and posted.
           next;
@@ -285,12 +288,14 @@ sub download_timeline {
 # Helper subroutine to post data
 sub post {
   my ($score, $desc) = @_;
-  if ($slack){
-    $furl->post(
-      $slack,
-      ["Content-type" => "application/json"],
-      encode_json {"text" => "*$score*\n> $desc"},
-    );
+  if (@slack){
+    foreach my $url (@slack){
+      $furl->post(
+        $url,
+        ["Content-type" => "application/json"],
+        encode_json {"text" => "*$score*\n> $desc"},
+      );
+    }
   } else {
     print '-'x30;
     print "\n$score\n$desc\n";
