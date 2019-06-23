@@ -3,12 +3,12 @@ use strict;
 
 =head1 NAME
 
-world-cup-slack 0.03
+world-cup-slack 0.04
 
 =cut
 
 package WorldCupSlack;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use File::Slurper qw/read_text write_text/;
 use Furl;
@@ -122,6 +122,7 @@ my $event_prefix = {
   26 => ':clap:',
   34 => ':face_palm: Own goal!',
   39 => ':soccer: Goooooalll!',
+  40 => ':soccer: Goooooalll!',
   41 => ':soccer: Goooooalll!',
   46 => ':no_good: Hit the bar!',
   60 => ':no_good: Saved!',

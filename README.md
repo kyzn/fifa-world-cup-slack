@@ -2,7 +2,7 @@
 
 # NAME
 
-world-cup-slack 0.03
+world-cup-slack 0.04
 
 # DESCRIPTION
 
